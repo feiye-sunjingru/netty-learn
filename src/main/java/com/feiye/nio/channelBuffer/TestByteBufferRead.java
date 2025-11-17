@@ -1,8 +1,8 @@
-package com.feiye.nio;
+package com.feiye.nio.channelBuffer;
 
 import java.nio.ByteBuffer;
 
-import static com.feiye.nio.ByteBufferUtil.debugAll;
+import static com.feiye.nio.channelBuffer.ByteBufferUtil.debugAll;
 
 //各种方法
 public class TestByteBufferRead {

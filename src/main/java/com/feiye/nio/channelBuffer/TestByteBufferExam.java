@@ -1,8 +1,8 @@
-package com.feiye.nio;
+package com.feiye.nio.channelBuffer;
 
 import java.nio.ByteBuffer;
 
-import static com.feiye.nio.ByteBufferUtil.debugAll;
+import static com.feiye.nio.channelBuffer.ByteBufferUtil.debugAll;
 
 /**
  * 网络上有多条数据发送给服务端，数据之间使用\n进行分隔

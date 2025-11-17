@@ -1,4 +1,4 @@
-package com.feiye.nio;
+package com.feiye.nio.file;
 
 import java.io.IOException;
 import java.nio.file.*;

@@ -1,4 +1,4 @@
-package com.feiye.nio;
+package com.feiye.nio.channelBuffer;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 
-import static com.feiye.nio.ByteBufferUtil.debugAll;
+import static com.feiye.nio.channelBuffer.ByteBufferUtil.debugAll;
 
 
 /**
