@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.feiye.nio.channelBuffer.ByteBufferUtil.debugAll;
 
@@ -25,9 +26,13 @@ public class MultiThreadServer {
 
         Selector boss = Selector.open();
         ssc.register(boss, SelectionKey.OP_ACCEPT);
-        //1.创建固定数量的worker
-        Worker worker = new Worker("worker-0");
+        //1.创建固定数量的worker: CPU核数
+        Worker[] workers = new Worker[Runtime.getRuntime().availableProcessors()];
+        for (int i = 0; i < workers.length; i++) {
+            workers[i] = new Worker("worker-" + i);
+        }
 
+        AtomicInteger index = new AtomicInteger();
         while (true) {
             boss.select();
             Iterator<SelectionKey> iterator = boss.selectedKeys().iterator();
@@ -40,7 +45,7 @@ public class MultiThreadServer {
                     log.debug("connected...{}", sc.getRemoteAddress());
                     //2.关联selector: 静态内部
                     log.debug("before register...{}", sc.getRemoteAddress());
-                    worker.register(sc);
+                    workers[index.getAndIncrement() % workers.length].register(sc);
                     log.debug("after register...{}", sc.getRemoteAddress());
                 }
             }
