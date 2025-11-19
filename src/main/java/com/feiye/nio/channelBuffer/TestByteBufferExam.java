@@ -28,7 +28,7 @@ public class TestByteBufferExam {
         source.flip();
 
         for (int i = 0; i < source.limit(); i++) {
-            //找到一条完整消息
+            //找到一条完整消息: 放到target ByteBuffer中
             if (source.get(i) == '\n') {
                 int length = i + 1 - source.position();
                 //完整的消息存入新的byteBuffer
