@@ -1,4 +1,4 @@
-package com.feiye.netty1;
+package com.feiye.netty1.hello;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelHandlerContext;
