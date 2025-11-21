@@ -1,4 +1,4 @@
-package com.feiye.netty1;
+package com.feiye.netty1.futuprom;
 
 import io.netty.channel.EventLoop;
 import io.netty.channel.nio.NioEventLoopGroup;

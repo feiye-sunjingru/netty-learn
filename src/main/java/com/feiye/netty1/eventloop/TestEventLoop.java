@@ -1,6 +1,5 @@
-package com.feiye.netty1;
+package com.feiye.netty1.eventloop;
 
-import io.netty.channel.DefaultEventLoop;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.NettyRuntime;

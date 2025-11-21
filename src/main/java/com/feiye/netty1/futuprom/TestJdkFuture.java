@@ -1,4 +1,4 @@
-package com.feiye.netty1;
+package com.feiye.netty1.futuprom;
 
 import lombok.extern.slf4j.Slf4j;
 

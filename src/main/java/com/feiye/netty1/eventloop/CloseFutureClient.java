@@ -1,9 +1,8 @@
-package com.feiye.netty1;
+package com.feiye.netty1.eventloop;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -14,6 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Scanner;
 
+/**
+ * 不断往客户端发送数据，q退出
+ */
 @Slf4j
 public class CloseFutureClient {
 
