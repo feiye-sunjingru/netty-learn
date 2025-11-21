@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class EventLoopClient {
     public static void main(String[] args) throws InterruptedException {
         // 1、客户端启动器
-        Channel channel = (Channel) new Bootstrap()
+        Channel channel = new Bootstrap()
                 // 2、添加 EventLoop
                 .group(new NioEventLoopGroup())
                 // 3、选择客户端 Channel 事件
