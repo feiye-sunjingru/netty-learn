@@ -52,17 +52,7 @@ public class TestPipelineServer {
                                 super.channelRead(ctx, student);
                             }
                         });
-                        pipeline.addLast("h3", new ChannelInboundHandlerAdapter() {
-                            @Override
-                            public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                                log.debug("3, 结果:{}, class:{}", msg, msg.getClass());
 
-                                // 向客户端写数据
-                                ByteBuf buffer = ctx.alloc().buffer();
-                                buffer.writeBytes("server...".getBytes());
-                                ch.writeAndFlush(buffer);
-                            }
-                        });
                         // 出站处理 (只有向客户端写数据才会触发)  tail -> h6 -> h5 -> h4
                         pipeline.addLast("h4", new ChannelOutboundHandlerAdapter() {
                             @Override
@@ -71,6 +61,22 @@ public class TestPipelineServer {
                                 super.write(ctx, msg, promise);
                             }
                         });
+
+                        pipeline.addLast("h3", new ChannelInboundHandlerAdapter() {
+                            @Override
+                            public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                                log.debug("3, 结果:{}, class:{}", msg, msg.getClass());
+
+                                // 向客户端写数据
+                                ByteBuf buffer = ctx.alloc().buffer();
+                                buffer.writeBytes("server...".getBytes());
+                                //从tail往前找出站处理器, 直至head
+                                ch.writeAndFlush(buffer);
+                                //注意：这是按添加顺序往前找出站处理器进行处理,直至head
+//                                ctx.writeAndFlush(buffer);
+                            }
+                        });
+
                         pipeline.addLast("h5", new ChannelOutboundHandlerAdapter() {
                             @Override
                             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
