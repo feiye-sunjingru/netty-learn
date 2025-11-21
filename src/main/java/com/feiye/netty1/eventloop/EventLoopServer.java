@@ -30,7 +30,7 @@ public class EventLoopServer {
                                     public void channelRead(ChannelHandlerContext ctx, Object msg) {
                                         ByteBuf buf = (ByteBuf) msg;
                                         log.debug("[{}]{}", Thread.currentThread().getName(), buf.toString(StandardCharsets.UTF_8));
-                                        //责任链模式：将信息传递给下一个handler
+                                        //不是责任链模式：将信息传递给下一个handler，如果不传这里就断掉了
                                         ctx.fireChannelRead(msg);
                                     }
                                     //使用group
