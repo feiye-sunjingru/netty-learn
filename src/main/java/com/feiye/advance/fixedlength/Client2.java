@@ -1,4 +1,4 @@
-package com.feiye.advance;
+package com.feiye.advance.fixedlength;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
