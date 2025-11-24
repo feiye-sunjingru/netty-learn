@@ -31,7 +31,7 @@ public class HelloWorldClient {
                                 @Override //channel连接成功后会触发active事件；也可以在connect.sync之后获取channel处理
                                 public void channelActive(ChannelHandlerContext ctx) throws Exception {
                                     ByteBuf buf = ctx.alloc().buffer(16);
-                                    buf.writeBytes(new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15});
+                                    buf.writeBytes(new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17});
                                     ctx.writeAndFlush(buf);
                                     ctx.channel().close();
                                 }

@@ -44,7 +44,7 @@
     <logger name="java.sql.PreparedStatement" level="DEBUG"/>
 
     <!-- 日志输出级别 -->
-    <logger name="com.feiye.netty1" level="DEBUG" additivity="false">
+    <logger name="com.feiye" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 
