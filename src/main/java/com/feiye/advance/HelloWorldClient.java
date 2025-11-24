@@ -10,6 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class HelloWorldClient {
     public static void main(String[] args) {
+        for (int i = 0; i < 10; i++) {
+            // 消息边界是建立连接和断开连接
+            send();
+        }
+        System.out.println("over");
+    }
+
+    private static void send() {
         NioEventLoopGroup workers = new NioEventLoopGroup();
         Bootstrap bootstrap = new Bootstrap();
         try {
@@ -22,13 +30,10 @@ public class HelloWorldClient {
                             ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                                 @Override //channel连接成功后会触发active事件；也可以在connect.sync之后获取channel处理
                                 public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                                    //发送10次的结果被服务器一下子全部接收完了：黏包现象
-                                    for (int i = 0; i < 10; i++) {
-                                        //记得要放在里面才会循环写入：否则只会写入一次，因为读写指针都到了最后
-                                        ByteBuf buf = ctx.alloc().buffer(16);
-                                        buf.writeBytes(new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15});
-                                        ctx.writeAndFlush(buf);
-                                    }
+                                    ByteBuf buf = ctx.alloc().buffer(16);
+                                    buf.writeBytes(new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15});
+                                    ctx.writeAndFlush(buf);
+                                    ctx.channel().close();
                                 }
                             });
                         }

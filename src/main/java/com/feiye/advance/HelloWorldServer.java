@@ -20,7 +20,7 @@ public class HelloWorldServer {
         ServerBootstrap serverBootstrap = new ServerBootstrap()
                 .group(boss, workers)
                 .channel(NioServerSocketChannel.class);
-        serverBootstrap.option(ChannelOption.SO_RCVBUF, 10);
+//        serverBootstrap.option(ChannelOption.SO_RCVBUF, 10);
         System.out.println();
         try {
             ChannelFuture channelFuture = serverBootstrap
