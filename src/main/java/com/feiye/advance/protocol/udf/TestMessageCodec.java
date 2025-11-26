@@ -17,13 +17,13 @@ public class TestMessageCodec {
         //不保存状态信息：线程安全：包含@Sharable已经充分考虑了线程安全，一个实例就够
         LoggingHandler loggingHandler = new LoggingHandler(LogLevel.DEBUG);
         //工人i使用这个：需要等待结果: 会出现并发问题（记录了当前线程的状态，就是线程不安全的）
-        //LengthFieldBasedFrameDecoder fieldBasedFrameDecoder = new LengthFieldBasedFrameDecoder(1024, 12, 4, 0, 0);
-
+        LengthFieldBasedFrameDecoder fieldBasedFrameDecoder = new LengthFieldBasedFrameDecoder(1024, 12, 4, 0, 0);
+        MessageCodecSharable messageCodecSharable = new MessageCodecSharable();
         EmbeddedChannel channel = new EmbeddedChannel(
                 loggingHandler,
                 //需要解决粘包半包问题：半包会导致decode错误
                 new LengthFieldBasedFrameDecoder(1024, 12, 4, 0, 0),
-                new MessageCodec()
+                messageCodecSharable //new MessageCodec()
         );
         // 消息正文
         LoginRequestMessage message = new LoginRequestMessage("mianbao", "admin", "面包");
