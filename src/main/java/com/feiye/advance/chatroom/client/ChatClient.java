@@ -122,7 +122,8 @@ public class ChatClient {
                                         // 群创建
                                         case "gcreate":
                                             Set<String> set = new HashSet<>(Arrays.asList(s[2].split(",")));
-                                            set.add(username); // 加入自己
+                                            // 加入自己
+                                            set.add(username);
                                             ctx.writeAndFlush(new GroupCreateRequestMessage(s[1], set));
                                             break;
                                         // 查看群成员
@@ -184,77 +185,4 @@ public class ChatClient {
             group.shutdownGracefully();
         }
     }
-
-/*    public void receiveInput() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("请输入用户名:");
-        String username = scanner.nextLine();
-        if (EXIT.get()) {
-            return;
-        }
-        System.out.println("请输入密码:");
-        String password = scanner.nextLine();
-        if (EXIT.get()) {
-            return;
-        }
-        LoginRequestMessage message = new LoginRequestMessage(username, password);
-        ctx.writeAndFlush(message);
-        System.out.println("等待后续操作...");
-
-        // 如果登录成功进入选择界面。如果登录失败，关闭channel
-        // 获取服务端返回的结果才能继续执行。通过CountDownLatch来通信
-        try {
-            WAIT_FOR_LOGIN.await(); // 阻塞，当为0后会继续执行
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        if (!LOGIN.get()) {
-            //登录失败，关闭channel
-            ctx.channel().close();
-            return;
-        }
-        // 登录成功，显示选择面板
-        while (true) {
-            System.out.println("==================================");
-            System.out.println("send [username] [content]");
-            System.out.println("gsend [group name] [content]");
-            System.out.println("gcreate [group name] [m1,m2,m3...]");
-            System.out.println("gmembers [group name]");
-            System.out.println("gjoin [group name]");
-            System.out.println("gquit [group name]");
-            System.out.println("quit");
-            System.out.println("==================================");
-            String command = scanner.nextLine();
-            if (EXIT.get()) {
-                return;
-            }
-            String[] s = command.split(" ");
-            switch (s[0]) {
-                case "send":
-                    ctx.writeAndFlush(new ChatRequestMessage(username, s[1], s[2]));
-                    break;
-                case "gsend":
-                    ctx.writeAndFlush(new GroupChatRequestMessage(username, s[1], s[2]));
-                    break;
-                case "gcreate":
-                    Set<String> set = new HashSet<>(Arrays.asList(s[2].split(",")));
-                    set.add(username); // 加入自己
-                    ctx.writeAndFlush(new GroupCreateRequestMessage(s[1], set));
-                    break;
-                case "gmembers":
-                    ctx.writeAndFlush(new GroupMembersRequestMessage(s[1]));
-                    break;
-                case "gjoin":
-                    ctx.writeAndFlush(new GroupJoinRequestMessage(username, s[1]));
-                    break;
-                case "gquit":
-                    ctx.writeAndFlush(new GroupQuitRequestMessage(username, s[1]));
-                    break;
-                case "quit":
-                    ctx.channel().close();
-                    return;
-            }
-        }
-    }*/
 }

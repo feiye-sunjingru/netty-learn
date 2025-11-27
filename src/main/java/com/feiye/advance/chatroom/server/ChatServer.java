@@ -63,8 +63,10 @@ public class ChatServer {
 
                     /*ch.pipeline().addLast(CHAT_HANDLER);
                     ch.pipeline().addLast(GROUP_CREATE_HANDLER);
-                    ch.pipeline().addLast(GROUP_CHAT_HANDLER);
-                    ch.pipeline().addLast(QUIT_HANDLER);*/
+                    ch.pipeline().addLast(GROUP_CHAT_HANDLER);*/
+
+                    // 客户端退出时触发
+                    ch.pipeline().addLast(QUIT_HANDLER);
                 }
 
             });
