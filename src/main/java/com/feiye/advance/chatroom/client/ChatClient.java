@@ -111,26 +111,33 @@ public class ChatClient {
                                     }
                                     String[] s = command.split(" ");
                                     switch (s[0]) {
+                                        // 单聊
                                         case "send":
                                             ctx.writeAndFlush(new ChatRequestMessage(username, s[1], s[2]));
                                             break;
+                                        // 群发
                                         case "gsend":
                                             ctx.writeAndFlush(new GroupChatRequestMessage(username, s[1], s[2]));
                                             break;
+                                        // 群创建
                                         case "gcreate":
                                             Set<String> set = new HashSet<>(Arrays.asList(s[2].split(",")));
                                             set.add(username); // 加入自己
                                             ctx.writeAndFlush(new GroupCreateRequestMessage(s[1], set));
                                             break;
+                                        // 查看群成员
                                         case "gmembers":
                                             ctx.writeAndFlush(new GroupMembersRequestMessage(s[1]));
                                             break;
+                                        // 加入群
                                         case "gjoin":
                                             ctx.writeAndFlush(new GroupJoinRequestMessage(username, s[1]));
                                             break;
+                                        // 退出群
                                         case "gquit":
                                             ctx.writeAndFlush(new GroupQuitRequestMessage(username, s[1]));
                                             break;
+                                        // 退出
                                         case "quit":
                                             ctx.channel().close();
                                             return;
