@@ -42,26 +42,15 @@ public class ChatServer {
                     // 判断是否有读空闲或者写空闲时间过长，会触发一个 IdleState#READER_IDLE 事件
 //                    ch.pipeline().addLast(new IdleStateHandler(5, 0, 0));
                     // 对IDLE事件进行处理
-/*                    ch.pipeline().addLast(new ChannelDuplexHandler() {
-                        // 用来触发特殊事件
-                        @Override
-                        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-                            IdleStateEvent event = (IdleStateEvent) evt;
-                            // 触发了读空闲事件
-                            if (event.state() == IdleState.READER_IDLE) {
-                                log.debug("已经 5s 没有读到数据了");
-                                ctx.channel().close();
-                            }
-                        }
-                    });*/
+                    ch.pipeline().addLast(new MyChannelDuplexHandler());
                     ch.pipeline().addLast(new ProcotolFrameDecoder());
                     ch.pipeline().addLast(LOGGING_HANDLER);
                     ch.pipeline().addLast(MESSAGE_CODEC);
 
                     //业务功能相关：登录
                     ch.pipeline().addLast(LOGIN_HANDLER);
-
-                    /*ch.pipeline().addLast(CHAT_HANDLER);
+                    ch.pipeline().addLast(CHAT_HANDLER);
+                    /*
                     ch.pipeline().addLast(GROUP_CREATE_HANDLER);
                     ch.pipeline().addLast(GROUP_CHAT_HANDLER);*/
 
@@ -80,4 +69,16 @@ public class ChatServer {
         }
     }
 
+    private static class MyChannelDuplexHandler extends ChannelDuplexHandler {
+        // 右键重构：匿名类转成内部类；移动类：用来触发特殊事件
+        @Override
+        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+            IdleStateEvent event = (IdleStateEvent) evt;
+            // 触发了读空闲事件
+            if (event.state() == IdleState.READER_IDLE) {
+                log.debug("已经 5s 没有读到数据了");
+                ctx.channel().close();
+            }
+        }
+    }
 }
