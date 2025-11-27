@@ -26,10 +26,15 @@ public class ChatServer {
 
         LoggingHandler LOGGING_HANDLER = new LoggingHandler();
         MessageCodecSharable MESSAGE_CODEC = new MessageCodecSharable();
+
         LoginRequestMessageHandler LOGIN_HANDLER = new LoginRequestMessageHandler();
         ChatRequestMessageHandler CHAT_HANDLER = new ChatRequestMessageHandler();
-        GroupCreateRequestMessageHandler GROUP_CREATE_HANDLER = new GroupCreateRequestMessageHandler();
         GroupChatRequestMessageHandler GROUP_CHAT_HANDLER = new GroupChatRequestMessageHandler();
+        GroupCreateRequestMessageHandler GROUP_CREATE_HANDLER = new GroupCreateRequestMessageHandler();
+        GroupMembersRequestMessageHandler GROUP_MEMBERS_HANDLER = new GroupMembersRequestMessageHandler();
+        GroupJoinRequestMessageHandler GROUP_JOIN_HANDLER = new GroupJoinRequestMessageHandler();
+        GroupQuitRequestMessageHandler GROUP_QUIT_HANDLER = new GroupQuitRequestMessageHandler();
+
         QuitHandler QUIT_HANDLER = new QuitHandler();
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -50,10 +55,11 @@ public class ChatServer {
                     //业务功能相关：登录
                     ch.pipeline().addLast(LOGIN_HANDLER);
                     ch.pipeline().addLast(CHAT_HANDLER);
-                    /*
+                    ch.pipeline().addLast(GROUP_CHAT_HANDLER);
                     ch.pipeline().addLast(GROUP_CREATE_HANDLER);
-                    ch.pipeline().addLast(GROUP_CHAT_HANDLER);*/
-
+                    ch.pipeline().addLast(GROUP_MEMBERS_HANDLER);
+                    ch.pipeline().addLast(GROUP_JOIN_HANDLER);
+                    ch.pipeline().addLast(GROUP_QUIT_HANDLER);
                     // 客户端退出时触发
                     ch.pipeline().addLast(QUIT_HANDLER);
                 }
