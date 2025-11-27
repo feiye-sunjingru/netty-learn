@@ -23,6 +23,7 @@ public class ChatServer {
     public static void main(String[] args) {
         NioEventLoopGroup boss = new NioEventLoopGroup();
         NioEventLoopGroup worker = new NioEventLoopGroup();
+
         LoggingHandler LOGGING_HANDLER = new LoggingHandler();
         MessageCodecSharable MESSAGE_CODEC = new MessageCodecSharable();
         LoginRequestMessageHandler LOGIN_HANDLER = new LoginRequestMessageHandler();
@@ -39,9 +40,9 @@ public class ChatServer {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
                     // 判断是否有读空闲或者写空闲时间过长，会触发一个 IdleState#READER_IDLE 事件
-                    ch.pipeline().addLast(new IdleStateHandler(5, 0, 0));
+//                    ch.pipeline().addLast(new IdleStateHandler(5, 0, 0));
                     // 对IDLE事件进行处理
-                    ch.pipeline().addLast(new ChannelDuplexHandler() {
+/*                    ch.pipeline().addLast(new ChannelDuplexHandler() {
                         // 用来触发特殊事件
                         @Override
                         public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
@@ -52,17 +53,18 @@ public class ChatServer {
                                 ctx.channel().close();
                             }
                         }
-                    });
+                    });*/
                     ch.pipeline().addLast(new ProcotolFrameDecoder());
-//                    ch.pipeline().addLast(LOGGING_HANDLER);
+                    ch.pipeline().addLast(LOGGING_HANDLER);
                     ch.pipeline().addLast(MESSAGE_CODEC);
 
-
+                    //业务功能相关：登录
                     ch.pipeline().addLast(LOGIN_HANDLER);
-                    ch.pipeline().addLast(CHAT_HANDLER);
+
+                    /*ch.pipeline().addLast(CHAT_HANDLER);
                     ch.pipeline().addLast(GROUP_CREATE_HANDLER);
                     ch.pipeline().addLast(GROUP_CHAT_HANDLER);
-                    ch.pipeline().addLast(QUIT_HANDLER);
+                    ch.pipeline().addLast(QUIT_HANDLER);*/
                 }
 
             });

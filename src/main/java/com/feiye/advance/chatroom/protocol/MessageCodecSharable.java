@@ -73,9 +73,7 @@ public class MessageCodecSharable extends MessageToMessageCodec<ByteBuf, Message
         Class<? extends Message> messageClass = Message.getMessageClass(messageType);
         Message message = serializerAlgorithm.deserialize(messageClass, bytes);
         log.debug("magicNum：{}, version：{}, serializerType：{}, messageType：{}, sequenceId：{}, length:{}", magicNum, version, serializerType, messageType, sequenceId, length);
-        log.debug("{}", message);
+        log.debug("decode:{}", message);
         out.add(message);
-
-
     }
 }
