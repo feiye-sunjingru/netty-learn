@@ -150,7 +150,7 @@ public class ChatClient {
                         // 读取服务端返回的信息
                         @Override
                         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                            log.debug("msg: {}", msg);
+//                            log.debug("msg: {}", msg);
                             if (msg instanceof LoginResponseMessage) {
                                 LoginResponseMessage loginResp = (LoginResponseMessage) msg;
                                 if (loginResp.isSuccess()) {

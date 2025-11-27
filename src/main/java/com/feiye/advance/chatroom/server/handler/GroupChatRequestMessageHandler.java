@@ -7,6 +7,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
  * 处理群聊消息，将群聊消息发送到对应的用户。
  */
 @ChannelHandler.Sharable
+@Slf4j
 public class GroupChatRequestMessageHandler extends SimpleChannelInboundHandler<GroupChatRequestMessage> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, GroupChatRequestMessage msg) throws Exception {
@@ -24,7 +26,10 @@ public class GroupChatRequestMessageHandler extends SimpleChannelInboundHandler<
         for (Channel channel : membersChannel) {
             channel.writeAndFlush(new GroupChatResponseMessage(msg.getFrom(), msg.getContent()));
         }
-
-        ctx.writeAndFlush(new GroupChatResponseMessage(true, "发送群聊消息成功！"));
+        if(membersChannel.isEmpty()){
+            ctx.writeAndFlush(new GroupChatResponseMessage(false, "组名不存在！"));
+        }else {
+            ctx.writeAndFlush(new GroupChatResponseMessage(true, "发送群聊消息成功！"));
+        }
     }
 }

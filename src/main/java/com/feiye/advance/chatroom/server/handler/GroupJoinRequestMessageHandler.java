@@ -7,12 +7,14 @@ import com.feiye.advance.chatroom.server.session.BaseGroupSessionFactory;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
 
 /**
  * Description 加入群聊Handler
  */
+@Slf4j
 @ChannelHandler.Sharable
 public class GroupJoinRequestMessageHandler extends SimpleChannelInboundHandler<GroupJoinRequestMessage> {
     @Override
@@ -22,7 +24,7 @@ public class GroupJoinRequestMessageHandler extends SimpleChannelInboundHandler<
         Set<String> members = groupSession.getMembers(msg.getGroupName());
         boolean joinFlag = false;
         // 群聊存在且用户未加入，才能加入 && groupSession.isCreated(msg.getGroupName()
-        if (!members.contains(msg.getUsername()) ) {
+        if (!members.isEmpty() && !members.contains(msg.getUsername()) ) {
             joinFlag = true;
         }
 

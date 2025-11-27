@@ -16,11 +16,10 @@ public class QuitHandler extends ChannelInboundHandlerAdapter {
         log.debug("{} 断开连接: {}", ctx.channel(), ctx.name());
     }
 
-    @Override
+    @Override //异常断开连接触发
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         // 捕获到异常触发
         BaseSessionFactory.getSession().unbind(ctx.channel());
-        log.debug("{} 断开连接，异常:{}，原因:{}", ctx.channel(), cause.getMessage(), cause);
-
+        log.debug("{} 断开连接，异常:{}", ctx.channel(), cause.getMessage());
     }
 }

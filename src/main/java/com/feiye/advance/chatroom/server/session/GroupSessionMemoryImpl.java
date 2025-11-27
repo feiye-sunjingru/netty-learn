@@ -14,6 +14,7 @@ public class GroupSessionMemoryImpl implements GroupSession {
 
     @Override
     public Group createGroup(String name, Set<String> members) {
+        //前提假设：这些成员都存在
         Group group = new Group(name, members);
         // key不存在或value是空，则插入并返回null; 否则就是key存在且value不为null,不处理且返回值
         Group res = groupMap.putIfAbsent(name, group);
