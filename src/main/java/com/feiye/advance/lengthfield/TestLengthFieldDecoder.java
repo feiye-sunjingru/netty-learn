@@ -17,8 +17,10 @@ public class TestLengthFieldDecoder {
         );
         // 4 个字节的内容长度， 实际内容
         ByteBuf byteBuf = ByteBufAllocator.DEFAULT.buffer();
+        //模拟发送2条消息
         send(byteBuf, "Hello, World");
         send(byteBuf, "Hi!");
+        //入站解码
         channel.writeInbound(byteBuf);
     }
 

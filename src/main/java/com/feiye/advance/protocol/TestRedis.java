@@ -13,6 +13,7 @@ import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * sudo nano /etc/redis/redis.conf
@@ -33,6 +34,7 @@ import java.nio.charset.Charset;
 @Slf4j
 public class TestRedis {
     public static void main(String[] args) {
+        //System.out.println("\r".getBytes(StandardCharsets.UTF_8)[0]);
         final byte[] LINE = {13, 10};   // \r \n
         NioEventLoopGroup worker = new NioEventLoopGroup();
         try {

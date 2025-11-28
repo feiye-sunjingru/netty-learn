@@ -4,7 +4,7 @@ package com.feiye.advance.chatroom.server.session;
 import io.netty.channel.Channel;
 
 /**
- * 会话管理接口
+ * 会话管理接口：用户和channel 的绑定关系
  */
 public interface Session {
 

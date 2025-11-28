@@ -27,6 +27,7 @@ public class TestHttp {
                 protected void initChannel(SocketChannel ch) throws Exception {
                     ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
                     // HttpServerCodec 编解码器（入站+出站处理器），解码器解析成两部分: 请求行和请求头；请求体
+                    // 浏览器默认还会请求/favicon.ico
                     ch.pipeline().addLast(new HttpServerCodec());
                     // 第一种
                     /*ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
@@ -47,9 +48,9 @@ public class TestHttp {
                     ch.pipeline().addLast(new SimpleChannelInboundHandler<HttpRequest>() {
                         @Override
                         protected void channelRead0(ChannelHandlerContext ctx, HttpRequest msg) throws Exception {
-                            // 获取请求，headers请求头（一般不关心）
-                            log.debug(msg.uri());
-                            // http协议版本、响应状态码
+                            // 获取请求; headers请求头（一般不关心）；
+                            log.debug("msg.uri:{}", msg.uri());
+                            // http协议版本(一般请求是什么版本返回也是一样的）、响应状态码
                             DefaultFullHttpResponse response =
                                     new DefaultFullHttpResponse(msg.protocolVersion(), HttpResponseStatus.OK);
                             byte[] bytes = "<h1>Hello, World!</h1>".getBytes();

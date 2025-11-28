@@ -15,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * 长度是1~10，但是都定长为10个
+ */
 @Slf4j
 public class Client2 {
     public static void main(String[] args) {
