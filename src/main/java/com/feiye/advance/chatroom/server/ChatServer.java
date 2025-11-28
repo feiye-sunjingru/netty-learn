@@ -44,10 +44,12 @@ public class ChatServer {
                 //建立连接才执行，且只执行一次。
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
-                    // 判断是否有读空闲或者写空闲时间过长，会触发一个 IdleState#READER_IDLE 事件
-//                    ch.pipeline().addLast(new IdleStateHandler(5, 0, 0));
-                    // 对IDLE事件进行处理
+                    // 空闲状态检测器：用来判断是不是 读空闲时间过长，或 写空闲时间过长
+                    // 5s 内如果没有收到 channel 的数据，会触发一个 IdleState#READER_IDLE 事件；不关心其他的空闲设为0
+                    ch.pipeline().addLast(new IdleStateHandler(5, 0, 0));
+                    // ChannelDuplexHandler 可以同时作为入站和出站处理器:对IdleState事件进行处理
                     ch.pipeline().addLast(new MyChannelDuplexHandler());
+
                     ch.pipeline().addLast(new ProcotolFrameDecoder());
                     ch.pipeline().addLast(LOGGING_HANDLER);
                     ch.pipeline().addLast(MESSAGE_CODEC);
