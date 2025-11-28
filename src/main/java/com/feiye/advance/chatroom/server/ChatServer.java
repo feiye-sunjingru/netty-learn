@@ -46,7 +46,7 @@ public class ChatServer {
                 protected void initChannel(SocketChannel ch) throws Exception {
                     // 空闲状态检测器：用来判断是不是 读空闲时间过长，或 写空闲时间过长
                     // 5s 内如果没有收到 channel 的数据，会触发一个 IdleState#READER_IDLE 事件；不关心其他的空闲设为0
-                    ch.pipeline().addLast(new IdleStateHandler(5, 0, 0));
+                    ch.pipeline().addLast(new IdleStateHandler(12, 0, 0));
                     // ChannelDuplexHandler 可以同时作为入站和出站处理器:对IdleState事件进行处理
                     ch.pipeline().addLast(new MyChannelDuplexHandler());
 
@@ -84,7 +84,7 @@ public class ChatServer {
             IdleStateEvent event = (IdleStateEvent) evt;
             // 触发了读空闲事件
             if (event.state() == IdleState.READER_IDLE) {
-                log.debug("已经 5s 没有读到数据了");
+                log.debug("已经 12s 没有读到数据了");
                 ctx.channel().close();
             }
         }

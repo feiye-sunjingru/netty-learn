@@ -45,136 +45,16 @@ public class ChatClient {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
                     ch.pipeline().addLast(new ProcotolFrameDecoder());
-//                    ch.pipeline().addLast(LOGGING_HANDLER);
+                    ch.pipeline().addLast(LOGGING_HANDLER);
                     ch.pipeline().addLast(MESSAGE_CODEC);
-                    // 判断是否有读空闲或者写空闲时间过长，会触发一个 IdleState#WRITER_IDLE 事件
-                    /*ch.pipeline().addLast(new IdleStateHandler(0, 3, 0));
+
+                    // 判断是否有读空闲或者写空闲时间过长，会触发一个 IdleState#WRITER_IDLE 事件:
+                    // 写时间(一般设为服务器读时间的1/2)要小于服务器那边读时间，否则会断开连接的
+                    ch.pipeline().addLast(new IdleStateHandler(0, 6, 0));
                     // 对IDLE事件进行处理
-                    ch.pipeline().addLast(new ChannelDuplexHandler() {
-                        // 用来触发特殊事件
-                        @Override
-                        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-                            IdleStateEvent event = (IdleStateEvent) evt;
-                            // 触发了读空闲事件
-                            if (event.state() == IdleState.WRITER_IDLE) {
-//                                log.debug("已经 3s 没有写数据了,发送一个心跳包");
-                                ctx.writeAndFlush(new PingMessage());
-                            }
-                        }
-                    });*/
+                    ch.pipeline().addLast(new MyChannelDuplexHandler());
 
-                    ch.pipeline().addLast("client handler", new ChannelInboundHandlerAdapter() {
-                        // 连接建立后执行active事件
-                        @Override
-                        public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                            // 1 新建一个线程"systemIn"，接受用户输入，并向服务器发送消息: 避免阻塞当前线程; 这个线程只会创建一次
-                            new Thread(() -> {
-                                Scanner scanner = new Scanner(System.in);
-                                System.out.println("请输入用户名:");
-                                String username = scanner.nextLine();
-
-                                System.out.println("请输入密码:");
-                                String password = scanner.nextLine();
-
-                                LoginRequestMessage message = new LoginRequestMessage(username, password);
-                                ctx.writeAndFlush(message);
-                                System.out.println("等待后续操作...");
-
-                                // 获取服务端返回的结果才能继续执行。通过CountDownLatch来通信
-                                try {
-                                    // 2 阻塞直到计数减为0
-                                    WAIT_FOR_LOGIN.await();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-
-                                if (!LOGIN.get()) {
-                                    //3登录失败，关闭channel
-                                    ctx.channel().close();
-                                    return;
-                                }
-
-                                // 3登录成功，显示选择面板
-                                while (true) {
-                                    System.out.println("==================================");
-                                    System.out.println("send [username] [content]");
-                                    System.out.println("gsend [group name] [content]");
-                                    System.out.println("gcreate [group name] [m1,m2,m3...]");
-                                    System.out.println("gmembers [group name]");
-                                    System.out.println("gjoin [group name]");
-                                    System.out.println("gquit [group name]");
-                                    System.out.println("quit");
-                                    System.out.println("==================================");
-                                    String command = scanner.nextLine();
-                                    if (EXIT.get()) {
-                                        return;
-                                    }
-                                    String[] s = command.split(" ");
-                                    switch (s[0]) {
-                                        // 单聊
-                                        case "send":
-                                            ctx.writeAndFlush(new ChatRequestMessage(username, s[1], s[2]));
-                                            break;
-                                        // 群发
-                                        case "gsend":
-                                            ctx.writeAndFlush(new GroupChatRequestMessage(username, s[1], s[2]));
-                                            break;
-                                        // 群创建
-                                        case "gcreate":
-                                            Set<String> set = new HashSet<>(Arrays.asList(s[2].split(",")));
-                                            // 加入自己
-                                            set.add(username);
-                                            ctx.writeAndFlush(new GroupCreateRequestMessage(s[1], set));
-                                            break;
-                                        // 查看群成员
-                                        case "gmembers":
-                                            ctx.writeAndFlush(new GroupMembersRequestMessage(s[1]));
-                                            break;
-                                        // 加入群
-                                        case "gjoin":
-                                            ctx.writeAndFlush(new GroupJoinRequestMessage(username, s[1]));
-                                            break;
-                                        // 退出群
-                                        case "gquit":
-                                            ctx.writeAndFlush(new GroupQuitRequestMessage(username, s[1]));
-                                            break;
-                                        // 退出
-                                        case "quit":
-                                            ctx.channel().close();
-                                            return;
-                                    }
-                                }
-                            }, "systemIn").start();
-                        }
-
-                        // 读取服务端返回的信息
-                        @Override
-                        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-//                            log.debug("msg: {}", msg);
-                            if (msg instanceof LoginResponseMessage) {
-                                LoginResponseMessage loginResp = (LoginResponseMessage) msg;
-                                if (loginResp.isSuccess()) {
-                                    LOGIN.set(true);
-                                }
-                                // 让计数减一：读取到登录结果后唤醒system in 线程
-                                WAIT_FOR_LOGIN.countDown();
-                            }
-                        }
-
-                        // 连接断开处理
-                        @Override
-                        public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-                            log.debug("连接已经断开，按任意键退出..");
-                            EXIT.set(true);
-                        }
-
-                        // 出现异常处理
-                        @Override
-                        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                            log.debug("由于异常连接已经断开，按任意键退出..{}", cause);
-                            EXIT.set(true);
-                        }
-                    });
+                    ch.pipeline().addLast("client handler", new MyChannelInboundHandlerAdapter(WAIT_FOR_LOGIN, LOGIN, EXIT));
                 }
             });
             Channel channel = bootstrap.connect("localhost", 8080).sync().channel();
@@ -183,6 +63,143 @@ public class ChatClient {
             log.error("client error", e);
         } finally {
             group.shutdownGracefully();
+        }
+    }
+
+    private static class MyChannelDuplexHandler extends ChannelDuplexHandler {
+        // 用来触发特殊事件
+        @Override
+        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+            IdleStateEvent event = (IdleStateEvent) evt;
+            // 触发了读空闲事件
+            if (event.state() == IdleState.WRITER_IDLE) {
+//                log.debug("已经 6s 没有写数据了,发送一个心跳包");
+                //短消息
+                ctx.writeAndFlush(new PingMessage());
+            }
+        }
+    }
+
+    private static class MyChannelInboundHandlerAdapter extends ChannelInboundHandlerAdapter {
+        private final CountDownLatch WAIT_FOR_LOGIN;
+        private final AtomicBoolean LOGIN;
+        private final AtomicBoolean EXIT;
+
+        public MyChannelInboundHandlerAdapter(CountDownLatch WAIT_FOR_LOGIN, AtomicBoolean LOGIN, AtomicBoolean EXIT) {
+            this.WAIT_FOR_LOGIN = WAIT_FOR_LOGIN;
+            this.LOGIN = LOGIN;
+            this.EXIT = EXIT;
+        }
+
+        // 连接建立后执行active事件
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            // 1 新建一个线程"systemIn"，接受用户输入，并向服务器发送消息: 避免阻塞当前线程; 这个线程只会创建一次
+            new Thread(() -> {
+                Scanner scanner = new Scanner(System.in);
+                System.out.println("请输入用户名:");
+                String username = scanner.nextLine();
+
+                System.out.println("请输入密码:");
+                String password = scanner.nextLine();
+
+                LoginRequestMessage message = new LoginRequestMessage(username, password);
+                ctx.writeAndFlush(message);
+                System.out.println("等待后续操作...");
+
+                // 获取服务端返回的结果才能继续执行。通过CountDownLatch来通信
+                try {
+                    // 2 阻塞直到计数减为0
+                    WAIT_FOR_LOGIN.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if (!LOGIN.get()) {
+                    //3登录失败，关闭channel
+                    ctx.channel().close();
+                    return;
+                }
+
+                // 3登录成功，显示选择面板
+                while (true) {
+                    System.out.println("==================================");
+                    System.out.println("send [username] [content]");
+                    System.out.println("gsend [group name] [content]");
+                    System.out.println("gcreate [group name] [m1,m2,m3...]");
+                    System.out.println("gmembers [group name]");
+                    System.out.println("gjoin [group name]");
+                    System.out.println("gquit [group name]");
+                    System.out.println("quit");
+                    System.out.println("==================================");
+                    String command = scanner.nextLine();
+                    if (EXIT.get()) {
+                        return;
+                    }
+                    String[] s = command.split(" ");
+                    switch (s[0]) {
+                        // 单聊
+                        case "send":
+                            ctx.writeAndFlush(new ChatRequestMessage(username, s[1], s[2]));
+                            break;
+                        // 群发
+                        case "gsend":
+                            ctx.writeAndFlush(new GroupChatRequestMessage(username, s[1], s[2]));
+                            break;
+                        // 群创建
+                        case "gcreate":
+                            Set<String> set = new HashSet<>(Arrays.asList(s[2].split(",")));
+                            // 加入自己
+                            set.add(username);
+                            ctx.writeAndFlush(new GroupCreateRequestMessage(s[1], set));
+                            break;
+                        // 查看群成员
+                        case "gmembers":
+                            ctx.writeAndFlush(new GroupMembersRequestMessage(s[1]));
+                            break;
+                        // 加入群
+                        case "gjoin":
+                            ctx.writeAndFlush(new GroupJoinRequestMessage(username, s[1]));
+                            break;
+                        // 退出群
+                        case "gquit":
+                            ctx.writeAndFlush(new GroupQuitRequestMessage(username, s[1]));
+                            break;
+                        // 退出
+                        case "quit":
+                            ctx.channel().close();
+                            return;
+                    }
+                }
+            }, "systemIn").start();
+        }
+
+        // 读取服务端返回的信息
+        @Override
+        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+//                            log.debug("msg: {}", msg);
+            if (msg instanceof LoginResponseMessage) {
+                LoginResponseMessage loginResp = (LoginResponseMessage) msg;
+                if (loginResp.isSuccess()) {
+                    LOGIN.set(true);
+                }
+                // 让计数减一：读取到登录结果后唤醒system in 线程
+                WAIT_FOR_LOGIN.countDown();
+            }
+        }
+
+        // 连接断开处理
+        @Override
+        public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+            log.debug("连接已经断开，按任意键退出..");
+            EXIT.set(true);
+        }
+
+        // 出现异常处理
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            log.debug("由于异常连接已经断开，按任意键退出..{}", cause);
+            EXIT.set(true);
         }
     }
 }
