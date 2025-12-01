@@ -62,15 +62,20 @@ public class MessageCodecSharable extends MessageToMessageCodec<ByteBuf, Message
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         int magicNum = in.readInt();
         byte version = in.readByte();
-        byte serializerType = in.readByte();// 序列化类型
-        byte messageType = in.readByte();//消息类型
+        // 序列化类型
+        byte serializerType = in.readByte();
+        //消息类型
+        byte messageType = in.readByte();
         int sequenceId = in.readInt();
         in.readByte();
         int length = in.readInt();
         byte[] bytes = new byte[length];
         in.readBytes(bytes, 0, length);
+        //找出反序列化算法
         Serializer.Algorithm serializerAlgorithm = Serializer.Algorithm.values()[serializerType];
+        //找出具体消息类型
         Class<? extends Message> messageClass = Message.getMessageClass(messageType);
+        //需要根据具体消息类型进行反序列化
         Message message = serializerAlgorithm.deserialize(messageClass, bytes);
         log.debug("magicNum：{}, version：{}, serializerType：{}, messageType：{}, sequenceId：{}, length:{}", magicNum, version, serializerType, messageType, sequenceId, length);
         log.debug("decode:{}", message);
