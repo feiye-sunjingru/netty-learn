@@ -21,10 +21,11 @@ public class TestConnectionTimeout {
         try {
             Bootstrap bootstrap = new Bootstrap()
                     .group(group)
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                    //本地回环网络延迟极低，通常远小于1毫秒
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 300)
                     .channel(NioSocketChannel.class)
                     .handler(new LoggingHandler());
-            ChannelFuture future = bootstrap.connect("127.0.0.1", 8080);
+            ChannelFuture future = bootstrap.connect("192.168.1.99", 8080);
             //连接交给其他线程处理：这里等连接成功：成功了才会有Channel
             future.sync().channel().closeFuture().sync(); // 断点1
         } catch (Exception e) {
