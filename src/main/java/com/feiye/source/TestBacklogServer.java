@@ -18,6 +18,7 @@ public class TestBacklogServer {
         // 本地处理accept 连接非常快：处理的快不会在队列里堆积：所以为了测试这边加了断点保持全连接队列
         ChannelFuture channelFuture = new ServerBootstrap()
                 .group(new NioEventLoopGroup())
+                .channel(NioServerSocketChannel.class)
                 //全连接队列设置: 客户端连接数一旦超过，客户端显示“服务器会拒绝新的连接”
                 .option(ChannelOption.SO_BACKLOG, 2)
                 .channel(NioServerSocketChannel.class)
