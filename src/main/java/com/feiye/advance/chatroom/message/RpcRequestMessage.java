@@ -1,6 +1,7 @@
 package com.feiye.advance.chatroom.message;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -8,6 +9,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString(callSuper = true)
+@NoArgsConstructor
 public class RpcRequestMessage extends Message {
 
     /**

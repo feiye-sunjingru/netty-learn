@@ -2,6 +2,7 @@ package com.feiye.advance.chatroom.message;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -10,6 +11,7 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper=false)
+@NoArgsConstructor
 public class RpcResponseMessage extends Message {
     /**
      * 返回值

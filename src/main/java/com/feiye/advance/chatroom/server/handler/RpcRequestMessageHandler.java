@@ -36,6 +36,7 @@ public class RpcRequestMessageHandler extends SimpleChannelInboundHandler<RpcReq
     public static void main(String[] args) {
         RpcRequestMessage rpcRequestMessage = new RpcRequestMessage(
                 1,
+                //复制接口引用即可
                 "com.feiye.advance.chatroom.server.service.HelloService",
                 "sayHello",
                 String.class,

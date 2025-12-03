@@ -39,6 +39,7 @@ public class RpcClient {
             });
             Channel channel = bootstrap.connect("localhost", 8080).sync().channel();
 
+            //异步操作（隐蔽异常）：通过增加监听把响应结果返回给调用方
             ChannelFuture future = channel.
                     writeAndFlush(new RpcRequestMessage(
                             1,

@@ -20,8 +20,10 @@ dependencies {
     // 日志实现（可选但推荐）
     runtimeOnly 'ch.qos.logback:logback-classic:1.4.14'
 
-    implementation group: 'io.netty', name: 'netty-all', version: '4.1.39.Final'
+    implementation group: 'io.netty', name: 'netty-all', version: '4.2.7.Final'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.2'
+//    implementation 'com.alibaba.fastjson2:fastjson2:2.0.60'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.1'
     implementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre'
 }
 
