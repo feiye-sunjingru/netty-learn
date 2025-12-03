@@ -48,6 +48,7 @@ public class MessageCodecSharable extends MessageToMessageCodec<ByteBuf, Message
         out.writeBytes(bytes);
 
         outList.add(out);
+        log.debug("encode:{}", msg);
     }
 
     /**
@@ -78,7 +79,7 @@ public class MessageCodecSharable extends MessageToMessageCodec<ByteBuf, Message
         //需要根据具体消息类型进行反序列化
         Message message = serializerAlgorithm.deserialize(messageClass, bytes);
         log.debug("magicNum：{}, version：{}, serializerType：{}, messageType：{}, sequenceId：{}, length:{}", magicNum, version, serializerType, messageType, sequenceId, length);
-        log.debug("decode:{}", message);
+//        log.debug("decode:{}", message);
         out.add(message);
     }
 }
