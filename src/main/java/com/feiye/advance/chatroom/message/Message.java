@@ -42,7 +42,7 @@ public abstract class Message implements Serializable {
     public static final int PingMessage = 14;
     public static final int PongMessage = 15;
     /**
-     * 请求类型 byte 值
+     * 请求类型 byte 值: 增加RPC消息请求和响应
      */
     public static final int RPC_MESSAGE_TYPE_REQUEST = 101;
     /**
