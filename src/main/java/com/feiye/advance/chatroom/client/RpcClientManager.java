@@ -8,6 +8,8 @@ import com.feiye.advance.chatroom.server.handler.RpcResponseMessageHandler;
 import com.feiye.advance.chatroom.server.service.HelloService;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -25,6 +27,7 @@ import static com.feiye.advance.chatroom.server.handler.RpcResponseMessageHandle
 
 /**
  * 把发送消息简化：不必写死在代码里，自动处理类型信息
+ * <Object> 表示“我知道它是 Object”，<?> 表示“我不知道它是什么类型”(只能get不能set,可以放null)。
  */
 @Slf4j
 public class RpcClientManager {
@@ -42,8 +45,10 @@ public class RpcClientManager {
         ));*/
 
         HelloService proxyService = getProxyService(HelloService.class);
-        proxyService.sayHello("张三");
-        proxyService.sayHello("李四");
+        //主线程发起调用
+        System.out.println(proxyService.sayHello("张三"));
+        System.out.println(proxyService.sayHello("李四"));
+        System.out.println(proxyService.sayHello("王五"));
     }
 
     /**
@@ -72,19 +77,19 @@ public class RpcClientManager {
                         args);
                 //2.发送消息对象
                 getChannel().writeAndFlush(msg);
-                // 接受信息是nioEventLoop在接受，这里线程要想获取结果通过promise.
-                //第二个参数是执行异步处理处理的线程。这里是同步的方式主线程await等待。
-                /*DefaultPromise<Object> promise = new DefaultPromise<>(getChannel().eventLoop());
+                // 多个线程之间接收结果: 准备一个空书包
+                //异步接收结果，使用其他线程eventloop
+                DefaultPromise<Object> promise = new DefaultPromise<>(getChannel().eventLoop());
                 // 将「空书包promise」放进map中，供另一个线程放结果。
                 PROMISES.put(sid, promise);
-                // 等待返回结果
+                // 等待返回结果:sync失败会抛异常，await失败不会抛异常，通过isSuccess继续判断。
                 promise.await();
+
                 if (promise.isSuccess()) {
                     return promise.getNow();
                 } else {
                     throw new RuntimeException(promise.cause());
-                }*/
-                return null;
+                }
             }
         });
         return (T) proxyInstance;
@@ -129,6 +134,12 @@ public class RpcClientManager {
                 ch.pipeline().addLast(LOGGING_HANDLER);
                 ch.pipeline().addLast(MESSAGE_CODEC);
                 ch.pipeline().addLast(RPC_HANDLER);
+                ch.pipeline().addLast("client handler", new ChannelInboundHandlerAdapter() {
+                    @Override
+                    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+                        ctx.fireChannelInactive();
+                    }
+                });
             }
         });
         try {
