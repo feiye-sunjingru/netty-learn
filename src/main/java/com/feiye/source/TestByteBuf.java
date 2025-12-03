@@ -17,6 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 从ChannelConfig找配置-DefaultChannelConfig-ByteBufAllocator-ByteBufUtil
  * UnpooledByteBufAllocator
+ *
+ * AbstractNioByteChannel-RecvByteBufAllocator.allocate(allocator):
+ * RecvByteBufAllocator 是bytebuf的分配器（池化/非池化）
+ * allocate方法决定大小、直接/堆内存
+ * guess根据之前接收的数据量调整大小
  */
 @Slf4j
 public class TestByteBuf {
@@ -38,6 +43,10 @@ public class TestByteBuf {
                                 ByteBuf buf = ctx.alloc().buffer();
                                 //PooledUnsafeDirectByteBuf(ridx: 0, widx: 0, cap: 256)
                                 log.debug("alloc buf: {}", buf);
+
+                                //InstrumentedUnpooledUnsafeDirectByteBuf(ridx: 0, widx: 6, cap: 1024)
+                                /*log.debug("receive buf: {}", msg);
+                                System.out.println("");*/
                             }
                         });
                     }
