@@ -47,8 +47,8 @@ public class RpcClientManager {
         HelloService proxyService = getProxyService(HelloService.class);
         //主线程发起调用
         System.out.println(proxyService.sayHello("张三"));
-        System.out.println(proxyService.sayHello("李四"));
-        System.out.println(proxyService.sayHello("王五"));
+        /*System.out.println(proxyService.sayHello("李四"));
+        System.out.println(proxyService.sayHello("王五"));*/
     }
 
     /**

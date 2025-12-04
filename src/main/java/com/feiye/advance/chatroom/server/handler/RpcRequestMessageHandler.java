@@ -4,6 +4,7 @@ import com.feiye.advance.chatroom.message.RpcRequestMessage;
 import com.feiye.advance.chatroom.message.RpcResponseMessage;
 import com.feiye.advance.chatroom.server.service.HelloService;
 import com.feiye.advance.chatroom.server.service.ServicesFactory;
+import com.feiye.advance.chatroom.utils.RpcException;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ public class RpcRequestMessageHandler extends SimpleChannelInboundHandler<RpcReq
             Object invoke = method.invoke(service, msg.getParameterValue());
             rpcResp.setReturnValue(invoke);
         } catch (Exception e) {
-            rpcResp.setExceptionValue(new Exception("远程调用失败" + e.getCause().getMessage()));
+            rpcResp.setExceptionValue(new RpcException("远程调用出错" + e.getCause().getMessage()));
             e.printStackTrace();
         }
         log.debug("server send msg");

@@ -13,6 +13,9 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * InvocationTargetException 反射出的异常
+ */
 @Slf4j
 public class RpcServer {
     public static void main(String[] args) {
