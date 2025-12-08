@@ -14,6 +14,7 @@ import java.util.List;
 @ChannelHandler.Sharable
 /**
  * 必须和 LengthFieldBasedFrameDecoder 一起使用，确保接到的 ByteBuf 消息是完整的
+ * 注意：这里protobuf老师尝试过，在这里不太好使
  */
 public class MessageCodecSharable extends MessageToMessageCodec<ByteBuf, Message> {
     /**
@@ -65,7 +66,7 @@ public class MessageCodecSharable extends MessageToMessageCodec<ByteBuf, Message
         byte version = in.readByte();
         // 序列化类型
         byte serializerType = in.readByte();
-        //消息类型
+        //具体的消息类型
         byte messageType = in.readByte();
         int sequenceId = in.readInt();
         in.readByte();

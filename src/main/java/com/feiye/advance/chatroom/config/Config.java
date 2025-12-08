@@ -27,11 +27,17 @@ public abstract class Config {
         }
     }
 
+    /**
+     * 获取序列化算法: 把字符串映射成对应的对象
+     *
+     * @return 序列化算法
+     */
     public static Serializer.Algorithm getSerializerAlgorithm() {
         String value = properties.getProperty("serializer.algorithm");
         if (value == null) {
             return Serializer.Algorithm.Java;
         } else {
+            //valueOf能讲字符串转成枚举对象
             return Serializer.Algorithm.valueOf(value);
         }
     }

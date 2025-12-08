@@ -14,7 +14,7 @@ import java.lang.reflect.Type;
 public interface Serializer {
 
 
-    // 反序列化方法：对象类型
+    // 反序列化方法：对象类型 ：<T> - 泛型参数声明
     <T> T deserialize(Class<T> clazz, byte[] bytes);
 
     // 序列化方法
