@@ -28,6 +28,10 @@ import static com.feiye.advance.chatroom.server.handler.RpcResponseMessageHandle
 /**
  * 把发送消息简化：不必写死在代码里，自动处理类型信息
  * <Object> 表示“我知道它是 Object”，<?> 表示“我不知道它是什么类型”(只能get不能set,可以放null)。
+ *
+ * 注意：
+ * 如果你在调试过程中查看了 proxyService 对象的内容（比如悬停鼠标或者加入 Watches），IDE 为了展示对象信息通常会调用 toString() 方法。
+ * 这会导致通过代理拦截并发送一个 RpcRequestMessage 到服务端去执行 toString() 方法。
  */
 @Slf4j
 public class RpcClientManager {
@@ -69,6 +73,7 @@ public class RpcClientManager {
         // 2. 拦截所有方法调用
         // 3. 自动发起远程调用
         Object proxyInstance = Proxy.newProxyInstance(classLoader, interfaces, (proxy, method, args) -> {
+            System.out.println("触发方法: " + method.getName());
             //1.将方法调用转换为消息对象
             int sid = SequenceIdGenerator.nextId();
             //sid是消息的key

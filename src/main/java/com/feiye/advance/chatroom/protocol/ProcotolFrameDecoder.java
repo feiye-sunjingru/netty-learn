@@ -4,6 +4,7 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 public class ProcotolFrameDecoder extends LengthFieldBasedFrameDecoder {
 
+    // 最大长度超过1024会抛出TooLongFrameException
     public ProcotolFrameDecoder() {
         this(1024, 12, 4, 0, 0);
     }

@@ -5,6 +5,7 @@ import com.feiye.advance.chatroom.message.RpcResponseMessage;
 import com.feiye.advance.chatroom.server.service.HelloService;
 import com.feiye.advance.chatroom.server.service.ServicesFactory;
 import com.feiye.advance.chatroom.utils.RpcException;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import java.lang.reflect.Method;
  * RPC 请求处理器: 通过反射机制调用方法
  */
 @Slf4j
+@ChannelHandler.Sharable
 public class RpcRequestMessageHandler extends SimpleChannelInboundHandler<RpcRequestMessage> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcRequestMessage msg) {

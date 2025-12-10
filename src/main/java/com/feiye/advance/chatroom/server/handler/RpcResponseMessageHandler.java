@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @ChannelHandler.Sharable
 public class RpcResponseMessageHandler extends SimpleChannelInboundHandler<RpcResponseMessage> {
-    //待处理的书包
+    //待处理的书包: 用于接收代理对象处理的结果; 也可以把PROMISES独立在这个类之外；为什么不能用Promise<?>泛型通配符:因为不能往里面放东西（可以放null），只能取值
     public static final ConcurrentHashMap<Integer, Promise<Object>> PROMISES = new ConcurrentHashMap<>();
 
     @Override
