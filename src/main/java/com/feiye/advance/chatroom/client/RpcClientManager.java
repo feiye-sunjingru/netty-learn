@@ -31,6 +31,7 @@ import static com.feiye.advance.chatroom.server.handler.RpcResponseMessageHandle
  */
 @Slf4j
 public class RpcClientManager {
+    //不用加volatile: 没有指令重排及半初始化问题
     private static Channel channel;
     private static final Object LOCK = new Object();
 
@@ -44,6 +45,7 @@ public class RpcClientManager {
                 new Object[]{"张三"}
         ));*/
 
+        //通过代理对象拿到 HelloService
         HelloService proxyService = getProxyService(HelloService.class);
         //主线程发起调用
         System.out.println(proxyService.sayHello("张三"));
@@ -63,40 +65,43 @@ public class RpcClientManager {
         Class<?>[] interfaces = new Class[]{serviceClass};
 
         // 创建代理对象: 类加载器，代理类实现的接口，代理要做的事情
-        Object proxyInstance = Proxy.newProxyInstance(classLoader, interfaces, new InvocationHandler() {
-            @Override
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                //1.将方法调用转换为消息对象
-                int sid = SequenceIdGenerator.nextId();
-                RpcRequestMessage msg = new RpcRequestMessage(
-                        sid,
-                        serviceClass.getName(),
-                        method.getName(),
-                        method.getReturnType(),
-                        method.getParameterTypes(),
-                        args);
-                //2.发送消息对象
-                getChannel().writeAndFlush(msg);
-                // 多个线程之间接收结果: 准备一个空书包
-                //异步接收结果，使用其他线程eventloop
-                DefaultPromise<Object> promise = new DefaultPromise<>(getChannel().eventLoop());
-                // 将「空书包promise」放进map中，供另一个线程放结果。
-                PROMISES.put(sid, promise);
-                // 等待返回结果:sync失败会抛异常，await失败不会抛异常，通过isSuccess继续判断。
-                promise.await();
+        // 1. 创建动态代理
+        // 2. 拦截所有方法调用
+        // 3. 自动发起远程调用
+        Object proxyInstance = Proxy.newProxyInstance(classLoader, interfaces, (proxy, method, args) -> {
+            //1.将方法调用转换为消息对象
+            int sid = SequenceIdGenerator.nextId();
+            //sid是消息的key
+            RpcRequestMessage msg = new RpcRequestMessage(
+                    sid,
+                    serviceClass.getName(),
+                    method.getName(),
+                    method.getReturnType(),
+                    method.getParameterTypes(),
+                    args);
+            //2.发送消息对象
+            getChannel().writeAndFlush(msg);
+            // 多个线程之间接收结果: 准备一个空书包
+            //异步接收结果，使用其他线程eventloop
+            DefaultPromise<Object> promise = new DefaultPromise<>(getChannel().eventLoop());
+            // 将「空书包promise」放进map中，供另一个线程放结果。
+            PROMISES.put(sid, promise);
+            // 等待返回结果:sync失败会抛异常，await失败不会抛异常，通过isSuccess继续判断。
+            promise.await();
 
-                if (promise.isSuccess()) {
-                    return promise.getNow();
-                } else {
-                    throw new RuntimeException(promise.cause());
-                }
+            //如果出错可以返回给主线程
+            if (promise.isSuccess()) {
+                //需要等有结果了再返回给用户
+                return promise.getNow();
+            } else {
+                throw new RuntimeException(promise.cause());
             }
         });
         return (T) proxyInstance;
     }
 
     /**
-     * 单例获取channel
+     * 单例获取channel：主要是客户端存在多个线程
      * 双检锁
      *
      * @return channel
