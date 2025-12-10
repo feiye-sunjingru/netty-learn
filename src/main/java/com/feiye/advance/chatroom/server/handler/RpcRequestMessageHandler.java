@@ -11,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 
+/**
+ * RPC 请求处理器: 通过反射机制调用方法
+ */
 @Slf4j
 public class RpcRequestMessageHandler extends SimpleChannelInboundHandler<RpcRequestMessage> {
     @Override
@@ -20,14 +23,15 @@ public class RpcRequestMessageHandler extends SimpleChannelInboundHandler<RpcReq
         rpcResp.setSequenceId(msg.getSequenceId());
         HelloService service = null;
         try {
-            //使用反射去调用：获取实现类
+            //1.获取实现类的Class对象
             service = (HelloService) ServicesFactory.getService(Class.forName(msg.getInterfaceName()));
-            // 获取方法：方法名、参数类型
+            //2.获取接口中的方法：方法名、参数类型
             Method method = service.getClass().getMethod(msg.getMethodName(), msg.getParameterTypes());
-            //调用实现类，传入参数
+            //3.调用实现类，传入参数
             Object invoke = method.invoke(service, msg.getParameterValue());
             rpcResp.setReturnValue(invoke);
         } catch (Exception e) {
+            //注意：这里自定义异常是为了减少输出的内容
             rpcResp.setExceptionValue(new RpcException("远程调用出错" + e.getCause().getMessage()));
             e.printStackTrace();
         }
