@@ -117,7 +117,9 @@ public interface Serializer {
 
         @Override             //   String.class
         public JsonElement serialize(Class<?> src, Type typeOfSrc, JsonSerializationContext context) {
-            //class->json: 字符串在gson中属于primitive
+            //class->json: 字符串在gson中属于primitive; src.getName:java.lang.String
+            //System.out.println("src.getName():"+src.getName());
+            //String转成JsonElement
             return new JsonPrimitive(src.getName());
         }
     }

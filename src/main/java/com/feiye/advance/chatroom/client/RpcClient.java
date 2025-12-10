@@ -39,7 +39,7 @@ public class RpcClient {
             });
             Channel channel = bootstrap.connect("localhost", 8080).sync().channel();
 
-            //异步操作（隐蔽异常）：通过增加监听把响应结果返回给调用方
+            //writeAndFlush：异步操作（隐蔽异常）：通过增加监听把响应结果返回给调用方
             ChannelFuture future = channel.
                     writeAndFlush(new RpcRequestMessage(
                             1,
@@ -48,6 +48,7 @@ public class RpcClient {
                             String.class,
                             new Class[]{String.class},
                             new Object[]{"张三"})).
+                    //这里的Promise和future是同一个对象：用于线程之间通信的
                     addListener(promise -> {
                         if (!promise.isSuccess()) {
                             log.debug("{}", promise.cause());
