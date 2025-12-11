@@ -4,8 +4,7 @@ import com.feiye.advance.chatroom.protocol.MessageCodecSharable;
 import com.feiye.advance.chatroom.protocol.ProcotolFrameDecoder;
 import com.feiye.advance.chatroom.server.handler.RpcRequestMessageHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -33,10 +32,17 @@ public class RpcServer {
             serverBootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(new ProcotolFrameDecoder());//防止粘包和半包
-                    ch.pipeline().addLast(LOGGING_HANDLER);// 打印日志
-                    ch.pipeline().addLast(MESSAGE_CODEC);// 编解码
-                    ch.pipeline().addLast(RPC_HANDLER);//rpc处理
+                    ChannelPipeline pipeline = ch.pipeline();
+                    pipeline.addLast(new ProcotolFrameDecoder());//防止粘包和半包
+                    pipeline.addLast(LOGGING_HANDLER);// 打印日志
+                    pipeline.addLast(MESSAGE_CODEC);// 编解码
+                    pipeline.addLast(RPC_HANDLER);//rpc处理
+                    pipeline.addLast(new ChannelInboundHandlerAdapter(){
+                        @Override
+                        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+                            log.error("server error", cause);
+                        }
+                    });
                 }
             });
             Channel channel = serverBootstrap.bind(8080).sync().channel();
