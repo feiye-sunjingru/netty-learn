@@ -3,6 +3,10 @@ package com.feiye.thread;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * CompletableFuture.runAsync() 是 Java 8 引入的 异步编程工具类
+ * CompletableFuture 中的一个静态方法，用于以异步方式执行一个不返回结果（即 void）的任务。
+ */
 public class CallerThread {
     public static void main(String[] args) {
         System.out.println("CallerThread");

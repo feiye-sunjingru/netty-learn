@@ -1,10 +1,13 @@
 package com.feiye.nio.file;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
+@Slf4j
 public class TestFileChannelTransferTo {
     public static void main(String[] args) {
         String prjRootPath = System.getProperty("user.dir");
@@ -32,6 +35,6 @@ public class TestFileChannelTransferTo {
         }
 
         long end = System.nanoTime();
-        System.out.println("transferTo 用时：" + (end - start) / 1000_000.0);
+        log.debug("transferTo 用时：{} s.", (end - start) / 1000_000_000.0);
     }
 }

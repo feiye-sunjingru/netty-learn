@@ -22,6 +22,7 @@ public class TestByteBufferString {
         debugAll(buffer2);
 
         CharBuffer buffer3 = StandardCharsets.UTF_8.decode(buffer1);
+        //java.nio.HeapCharBuffer
         System.out.println(buffer3.getClass());
         System.out.println(buffer3.toString());
 
@@ -32,6 +33,7 @@ public class TestByteBufferString {
         //buffer转字符串
         String str1 = StandardCharsets.UTF_8.decode(buffer4).toString();
         System.out.println(str1);
+        //这里需要先切换成读模式，才能进行解码
         buffer.flip();
         System.out.println(StandardCharsets.UTF_8.decode(buffer));
     }

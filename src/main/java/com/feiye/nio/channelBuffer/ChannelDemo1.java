@@ -21,7 +21,7 @@ public class ChannelDemo1 {
             // 准备缓冲区
             ByteBuffer buffer = ByteBuffer.allocate(10);
             do {
-                // 从channel 读取数据到 buffer
+                // 从channel大数据，写到 buffer里
                 int len = channel.read(buffer);
                 log.debug("读到字节数：{}", len);
                 // 读取完毕
