@@ -5,14 +5,19 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 匿名类里面不能使用非final变量，这里可以用原子类型变量
+ *
+ * 对于函数式接口（只有一个抽象方法的接口），匿名类可被 Lambda 表达式 替代
+ */
 public class TestFilesWalkFileTree {
     public static void main(String[] args) throws IOException {
         // 要遍历的根目录
         Path path = Paths.get("D:\\PersonPrograms\\jdk1.8.0_202");
-//        runStatistics(path);
-//        runJarStatistics(path);
+        runStatistics(path);
+        runJarStatistics(path);
         runDelete();
-//        runCopy();
+        runCopy();
     }
 
     public static void runJarStatistics(Path path) throws IOException {
@@ -40,7 +45,7 @@ public class TestFilesWalkFileTree {
         // 记录文件数量
         AtomicInteger fileCount = new AtomicInteger();
 
-        // 遍历目录和文件
+        // 遍历目录和文件：SimpleFileVisitor
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
