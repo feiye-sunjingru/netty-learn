@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
+/**
+ * try之后channel关闭了
+ */
 public class Client {
     public static void main(String[] args) throws IOException {
         //SocketChannel.read 会在没有数据可读时让线程暂停
