@@ -11,6 +11,12 @@ import java.util.Iterator;
 
 import static com.feiye.nio.channelBuffer.ByteBufferUtil.debugAll;
 
+/**
+ * 1.事件来了之后要么处理，要么取消，否则会陷入循环: 事件处理完毕要删除这个key：否则还是一直遍历处理
+ * 2.客户端断开，如何不影响服务器：异常则 try-catch 进行 key.cLancel，正常关闭则 read=-1 进行 key.cancel
+ *   否则：客户端断开发送 FIN， 触发读事件；后续 selector 仍监听该 channel, 调用内核函数结果”仍有 EOF 可读“，再次触发，即 channel 未注销就一直认为有可读内容，导致循环
+ *   key.cancel()：将 key 标记为“cancelled”，并在 下一次 select() 调用时，从 Selector 的内部 key 集合中彻底移除
+ */
 @Slf4j
 public class SelectorServer {
 
